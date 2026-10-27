@@ -248,7 +248,7 @@ export function AuctioneerPage() {
         {lots.map(l => <tr key={String(l.id)}><td>#{String(l.id)} — {String(l.title)}</td><td>{String(l.status)}</td><td>{date(l.starts_at)}<br/>{date(l.ends_at)}</td><td>{l.is_settled ? (l.winning_amount == null ? 'Encerrado sem lances' : `Arrematado por ${money(l.winning_amount)}`) : 'Ainda não liquidado'}</td><td className="portal-actions">
           {l.status !== 'closed' && l.status !== 'cancelled' && <button onClick={() => void lotAction(l.id,'cancel')}>Cancelar</button>}
           {l.status !== 'cancelled' && !l.is_settled && <button onClick={() => void lotAction(l.id,'settle')}>Liquidar</button>}
-          {l.status === 'closed' && l.is_settled && <a href={`/lots/${String(l.id)}/receipt`}>Comprovante</a>}
+          {Boolean(l.status === 'closed' && l.is_settled) && <a href={`/lots/${String(l.id)}/receipt`}>Comprovante</a>}
         </td></tr>)}
       </tbody></table></div>
     </section>
