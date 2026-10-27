@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: verzel
+      POSTGRES_USER: verzel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-verzel_local_change_me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - verzel_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verzel -d verzel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://verzel:${POSTGRES_PASSWORD:-verzel_local_change_me}@db:5432/verzel
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-replace-this-development-secret-with-at-least-32-random-bytes}
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080
+    ports:
+      - "8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8001
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  verzel_pgdata:

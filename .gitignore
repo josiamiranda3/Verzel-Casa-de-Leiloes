@@ -1,0 +1,41 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python
+**/.venv/
+**/__pycache__/
+*.py[cod]
+**/.pytest_cache/
+.coverage
+htmlcov/
+
+# Local audit data and backups
+**/audit_checkpoint.json
+**/audit_events_backup_*.json
+
+# Frontend dependencies and generated builds
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local audit backup
+backend/audit_checkpoint.backup.json

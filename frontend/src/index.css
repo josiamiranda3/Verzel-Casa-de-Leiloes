@@ -1,0 +1,762 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #172033;
+  background: #f6f7f9;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-primary: #14243a;
+  --color-primary-light: #203956;
+  --color-gold: #c6a15b;
+  --color-gold-hover: #b28c48;
+  --color-background: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-text: #172033;
+  --color-muted: #737d8d;
+  --color-border: #e5e9ef;
+  --color-success: #16845b;
+
+  --font-heading: 'Manrope', sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 8px 28px rgba(20, 36, 58, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+body,
+button,
+input {
+  font-family: 'DM Sans', sans-serif;
+}
+
+button,
+input {
+  font-size: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(198, 161, 91, 0.7);
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  color: var(--color-text);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--color-primary-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* Portais de carteira, leiloeiro, arremates e comprovantes */
+.portal-page { max-width: 1180px; margin: 0 auto; padding: 42px 24px 80px; color: var(--color-primary, #14253d); }
+.portal-header { margin-bottom: 28px; border-bottom: 1px solid #e3e7ed; padding-bottom: 18px; }
+.portal-header a, .portal-page a { color: #176d80; font-weight: 700; }
+.portal-header h1 { margin: 16px 0 0; font-size: clamp(28px, 4vw, 42px); }
+.portal-card { margin: 18px 0; padding: 24px; border: 1px solid #e0e5eb; border-radius: 12px; background: #fff; box-shadow: 0 5px 18px rgba(20,37,61,.04); }
+.portal-card h2 { margin-top: 0; font-size: 21px; }
+.portal-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.portal-grid .portal-card { display: flex; flex-direction: column; gap: 10px; }
+.portal-card span { color: #657286; }
+.portal-card strong { font-size: 25px; }
+.portal-form { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; }
+.portal-form label { display: flex; flex: 1 1 180px; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 700; }
+.portal-form input { min-width: 0; min-height: 42px; padding: 9px 12px; border: 1px solid #cbd3de; border-radius: 6px; font: inherit; }
+.portal-form button, .portal-card button, .portal-actions button { min-height: 40px; padding: 9px 14px; border: 0; border-radius: 6px; background: #14253d; color: white; font-weight: 700; cursor: pointer; }
+.portal-form button.secondary { background: #e8edf3; color: #14253d; }
+.portal-error, .portal-success { padding: 12px 16px; border-radius: 8px; }
+.portal-error { color: #8a1c1c; background: #fff0f0; }
+.portal-success { color: #14532d; background: #edfdf3; }
+.portal-table-wrap { width: 100%; overflow-x: auto; }
+.portal-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.portal-table th, .portal-table td { padding: 12px 10px; border-bottom: 1px solid #e8ebf0; text-align: left; vertical-align: top; }
+.portal-table th { color: #657286; font-size: 12px; text-transform: uppercase; }
+.portal-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.portal-actions button { min-height: 32px; padding: 6px 9px; font-size: 12px; }
+.portal-items { display: grid; grid-template-columns: repeat(auto-fill,minmax(190px,1fr)); gap: 12px; margin-top: 18px; }
+.portal-item { display: flex; flex-direction: column; gap: 8px; padding: 12px; text-align: left; border: 1px solid #dce2ea; border-radius: 8px; background: white; cursor: pointer; }
+.portal-item.selected { border-color: #176d80; box-shadow: 0 0 0 2px #176d8022; }
+.portal-item img { width: 100%; height: 160px; object-fit: contain; background: #f5f6f8; }
+.portal-item span, .portal-item small { font-size: 12px; color: #657286; }
+.portal-page pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 700px) { .portal-grid { grid-template-columns: 1fr; } .portal-page { padding: 26px 14px 60px; } .portal-card { padding: 16px; } }
+
+
+/* Sistema visual dos portais: carteira, leiloeiro, arremates e auditoria */
+.portal-page { width:min(100% - 48px, 1240px); padding:clamp(28px,5vw,60px) 0 84px; }
+.portal-header { display:flex; align-items:flex-start; flex-direction:column; gap:14px; margin-bottom:30px; padding:0 0 24px; border-bottom:1px solid #e0e6ee; }
+.portal-header a { display:inline-flex; align-items:center; gap:8px; color:#7b6335; font-size:13px; }
+.portal-header h1 { margin:0; letter-spacing:-.04em; line-height:1.1; }
+.portal-page a { color:#8c6a2d; }
+.portal-card { margin:18px 0; padding:clamp(18px,3vw,30px); border:1px solid #e4e9f0; border-radius:20px; box-shadow:0 10px 32px rgba(20,36,58,.055); }
+.portal-card h2 { letter-spacing:-.025em; }
+.portal-grid { gap:18px; }
+.portal-page input,.portal-page select,.portal-page textarea { max-width:100%; min-height:44px; border:1px solid #d7dfe9; border-radius:10px; padding:10px 12px; background:#fff; color:#172033; }
+.portal-page button { min-height:42px; border-radius:10px; }
+.portal-page table { width:100%; border-collapse:separate; border-spacing:0; }
+.portal-page th { background:#f4f6f9; color:#536176; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+.portal-page th,.portal-page td { padding:13px 14px; border-bottom:1px solid #e7ebf1; text-align:left; vertical-align:top; }
+.portal-page tr:last-child td { border-bottom:0; }
+.portal-card { overflow-wrap:anywhere; }
+.portal-card pre { max-width:100%; overflow:auto; }
+@media (max-width: 768px) {
+  .portal-page { width:calc(100% - 32px); padding:28px 0 56px; }
+  .portal-header { gap:12px; margin-bottom:22px; }
+  .portal-header h1 { font-size:clamp(26px,7vw,36px); }
+  .portal-card { margin:14px 0; padding:18px; border-radius:16px; }
+  .portal-grid { grid-template-columns:minmax(0,1fr) !important; }
+  .portal-page form { min-width:0; }
+  .portal-page input,.portal-page select,.portal-page textarea { width:100%; min-width:0; }
+  .portal-page table { display:block; max-width:100%; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch; }
+  .portal-page th,.portal-page td { padding:11px 12px; }
+  .portal-page button { max-width:100%; }
+}
+@media (max-width: 380px) {
+  .portal-page { width:calc(100% - 24px); }
+  .portal-card { padding:14px; }
+}
+
+
+/* Tema escuro global — compartilhado pela vitrine e por todos os portais. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-primary: #e5edf8;
+  --color-primary-light: #b8c9df;
+  --color-gold: #d8b56d;
+  --color-gold-hover: #edcc85;
+  --color-background: #101722;
+  --color-surface: #182230;
+  --color-text: #e8edf5;
+  --color-muted: #a2afc0;
+  --color-border: #344153;
+  --color-success: #5bc99a;
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, .24);
+}
+
+:root[data-theme='dark'] body {
+  background: #101722;
+  color: #e8edf5;
+}
+
+:root[data-theme='dark'] h1,
+:root[data-theme='dark'] h2,
+:root[data-theme='dark'] h3,
+:root[data-theme='dark'] h4 {
+  color: var(--color-text);
+}
+
+.theme-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.theme-toggle:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0, 0, 0, .28); }
+.theme-toggle > span:first-child { font-size: 20px; line-height: 1; }
+:root[data-theme='dark'] .theme-toggle { background: #e0bd73; color: #182230; border-color: #e0bd73; }
+
+/* Fundo, textos e controles da vitrine. */
+:root[data-theme='dark'] .app-shell { background: #101722; color: #e8edf5; }
+:root[data-theme='dark'] .site-header,
+:root[data-theme='dark'] .main-nav,
+:root[data-theme='dark'] .search-box,
+:root[data-theme='dark'] .lot-card,
+:root[data-theme='dark'] .step-card,
+:root[data-theme='dark'] .hero-proof,
+:root[data-theme='dark'] .trust-strip,
+:root[data-theme='dark'] .lot-detail-card,
+:root[data-theme='dark'] .standalone-login-card,
+:root[data-theme='dark'] .account-menu {
+  background: #182230;
+  color: #e8edf5;
+  border-color: #344153;
+}
+:root[data-theme='dark'] .site-header { background: rgba(24, 34, 48, .94); }
+:root[data-theme='dark'] .brand,
+:root[data-theme='dark'] .main-nav a,
+:root[data-theme='dark'] .login-link,
+:root[data-theme='dark'] .lot-content h3,
+:root[data-theme='dark'] .section-heading h2,
+:root[data-theme='dark'] .how-intro h2,
+:root[data-theme='dark'] .account-menu a,
+:root[data-theme='dark'] .account-menu button { color: #e8edf5; }
+:root[data-theme='dark'] .main-nav a:hover,
+:root[data-theme='dark'] .main-nav .nav-active,
+:root[data-theme='dark'] .login-link:hover { color: #e0bd73; }
+:root[data-theme='dark'] .mobile-menu-toggle { background: #202d3e; border-color: #344153; }
+:root[data-theme='dark'] .mobile-menu-toggle span { background: #e8edf5; }
+:root[data-theme='dark'] .main-nav a:hover,
+:root[data-theme='dark'] .account-menu a:hover,
+:root[data-theme='dark'] .account-menu button:hover { background: #26364a; }
+:root[data-theme='dark'] .account-status-button { background: #1d3a31; border-color: #315c4c; color: #c8f5df; }
+:root[data-theme='dark'] .search-box input,
+:root[data-theme='dark'] .standalone-login-form input,
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] textarea { background: #111b28; color: #e8edf5; border-color: #405066; }
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder { color: #91a0b3; }
+:root[data-theme='dark'] .category-chip { background: #202d3e; color: #d4dce8; border-color: #3a485b; }
+:root[data-theme='dark'] .category-chip.active,
+:root[data-theme='dark'] .category-chip[aria-pressed='true'] { background: #d8b56d; color: #182230; }
+:root[data-theme='dark'] .lot-card,
+:root[data-theme='dark'] .lot-detail-card { box-shadow: 0 12px 34px rgba(0, 0, 0, .2); }
+:root[data-theme='dark'] .lot-meta,
+:root[data-theme='dark'] .lot-description,
+:root[data-theme='dark'] .standalone-login-description,
+:root[data-theme='dark'] .brand-name small { color: #a2afc0; }
+:root[data-theme='dark'] .detail-price-panel { background: #202d3e; }
+:root[data-theme='dark'] .site-footer { background: #0b111a; color: #d4dce8; }
+:root[data-theme='dark'] .site-footer h2,
+:root[data-theme='dark'] .site-footer h3 { color: #f2f5f9; }
+
+/* Painéis internos: carteira, leiloeiro, arremates, comprovantes e auditoria. */
+:root[data-theme='dark'] .portal-page { color: #e8edf5; }
+:root[data-theme='dark'] .portal-header { border-color: #344153; }
+:root[data-theme='dark'] .portal-card,
+:root[data-theme='dark'] .portal-item { background: #182230; color: #e8edf5; border-color: #344153; box-shadow: 0 10px 28px rgba(0, 0, 0, .18); }
+:root[data-theme='dark'] .portal-card span,
+:root[data-theme='dark'] .portal-item span,
+:root[data-theme='dark'] .portal-item small,
+:root[data-theme='dark'] .portal-table th { color: #a2afc0; }
+:root[data-theme='dark'] .portal-page a { color: #e0bd73; }
+:root[data-theme='dark'] .portal-page input,
+:root[data-theme='dark'] .portal-page select,
+:root[data-theme='dark'] .portal-page textarea,
+:root[data-theme='dark'] .portal-form input { background: #111b28; color: #e8edf5; border-color: #405066; }
+:root[data-theme='dark'] .portal-form button,
+:root[data-theme='dark'] .portal-card button,
+:root[data-theme='dark'] .portal-actions button { background: #d8b56d; color: #182230; }
+:root[data-theme='dark'] .portal-form button.secondary { background: #29384b; color: #e8edf5; }
+:root[data-theme='dark'] .portal-table th,
+:root[data-theme='dark'] .portal-table td { border-color: #344153; }
+:root[data-theme='dark'] .portal-item img { background: #111b28; }
+:root[data-theme='dark'] .portal-error { background: #3c2026; color: #ffc5cb; }
+:root[data-theme='dark'] .portal-success { background: #19392e; color: #bdf2d7; }
+
+@media (max-width: 520px) {
+  .theme-toggle { right: 12px; bottom: 12px; min-height: 42px; padding: 0 13px; }
+  .theme-toggle-label { display: none; }
+  .theme-toggle > span:first-child { font-size: 22px; }
+}
+
+
+/* Revisão do tema escuro: superfícies consistentes e contraste legível. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-primary: #e8edf5;
+  --color-primary-light: #c7d4e5;
+  --color-gold: #dfb965;
+  --color-gold-hover: #f0cc7c;
+  --color-background: #101722;
+  --color-surface: #1b2635;
+  --color-text: #edf2f8;
+  --color-muted: #aab6c6;
+  --color-border: #344255;
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, .24);
+  background: #101722;
+  color: #edf2f8;
+}
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] #root,
+:root[data-theme='dark'] .app-shell {
+  background: #101722;
+  color: #edf2f8;
+}
+:root[data-theme='dark'] .announcement {
+  background: #202b3a;
+  color: #d7e0ec;
+  border-color: #344255;
+}
+:root[data-theme='dark'] .hero-section,
+:root[data-theme='dark'] .lots-section,
+:root[data-theme='dark'] .how-section,
+:root[data-theme='dark'] .lot-detail-section,
+:root[data-theme='dark'] .standalone-login-section {
+  background: #101722;
+  color: #edf2f8;
+}
+:root[data-theme='dark'] .hero-section {
+  background: radial-gradient(ellipse at 2% 12%, rgba(223,185,101,.08), transparent 42%), #101722;
+}
+:root[data-theme='dark'] .hero-copy h1,
+:root[data-theme='dark'] .section-heading h2,
+:root[data-theme='dark'] .how-intro h2,
+:root[data-theme='dark'] .detail-content h1,
+:root[data-theme='dark'] .detail-content h2,
+:root[data-theme='dark'] .standalone-login-card h1,
+:root[data-theme='dark'] .empty-state h3,
+:root[data-theme='dark'] .step-card h3 {
+  color: #edf2f8;
+}
+:root[data-theme='dark'] .hero-description,
+:root[data-theme='dark'] .section-heading p,
+:root[data-theme='dark'] .how-intro > p,
+:root[data-theme='dark'] .detail-description,
+:root[data-theme='dark'] .detail-information,
+:root[data-theme='dark'] .step-card p,
+:root[data-theme='dark'] .empty-state p,
+:root[data-theme='dark'] .hero-proof,
+:root[data-theme='dark'] .proof-item,
+:root[data-theme='dark'] .trust-strip,
+:root[data-theme='dark'] .trust-item small {
+  color: #aab6c6;
+}
+:root[data-theme='dark'] .hero-proof,
+:root[data-theme='dark'] .trust-strip,
+:root[data-theme='dark'] .step-card,
+:root[data-theme='dark'] .empty-state,
+:root[data-theme='dark'] .detail-information,
+:root[data-theme='dark'] .detail-price-panel,
+:root[data-theme='dark'] .standalone-login-card,
+:root[data-theme='dark'] .bid-history,
+:root[data-theme='dark'] .bid-section {
+  background: #1b2635;
+  color: #edf2f8;
+  border-color: #344255;
+}
+:root[data-theme='dark'] .search-box {
+  background: #1b2635;
+  border: 1px solid #3a485c;
+  box-shadow: 0 8px 28px rgba(0,0,0,.2);
+}
+:root[data-theme='dark'] .search-box input {
+  background: transparent;
+}
+:root[data-theme='dark'] .button-primary,
+:root[data-theme='dark'] .header-cta,
+:root[data-theme='dark'] .lot-bid-button,
+:root[data-theme='dark'] .standalone-login-submit {
+  background: #dfb965;
+  color: #182230;
+  border-color: #dfb965;
+}
+:root[data-theme='dark'] .button-primary:hover,
+:root[data-theme='dark'] .header-cta:hover,
+:root[data-theme='dark'] .lot-bid-button:hover,
+:root[data-theme='dark'] .standalone-login-submit:hover {
+  background: #f0cc7c;
+  color: #182230;
+}
+:root[data-theme='dark'] .text-link,
+:root[data-theme='dark'] .detail-back-button,
+:root[data-theme='dark'] .standalone-login-back {
+  color: #dfb965;
+}
+:root[data-theme='dark'] .lot-image,
+:root[data-theme='dark'] .detail-image-wrap,
+:root[data-theme='dark'] .favorite-button {
+  background: #263447;
+  color: #edf2f8;
+}
+:root[data-theme='dark'] .lot-status,
+:root[data-theme='dark'] .lot-category,
+:root[data-theme='dark'] .price-label,
+:root[data-theme='dark'] .lot-meta,
+:root[data-theme='dark'] .lot-description {
+  color: #b8c4d3;
+}
+:root[data-theme='dark'] .site-footer {
+  background: #090e15;
+  color: #c8d2df;
+  border-top: 1px solid #263244;
+}
+:root[data-theme='dark'] .site-footer p,
+:root[data-theme='dark'] .site-footer a,
+:root[data-theme='dark'] .footer-copy { color: #aab6c6; }
+:root[data-theme='dark'] .site-footer h2,
+:root[data-theme='dark'] .site-footer h3 { color: #edf2f8; }
+:root[data-theme='dark'] .portal-page,
+:root[data-theme='dark'] .portal-page h1,
+:root[data-theme='dark'] .portal-page h2,
+:root[data-theme='dark'] .portal-page h3,
+:root[data-theme='dark'] .portal-page label { color: #edf2f8; }
+:root[data-theme='dark'] .portal-header,
+:root[data-theme='dark'] .portal-table th,
+:root[data-theme='dark'] .portal-table td { border-color: #344255; }
+:root[data-theme='dark'] .portal-page input,
+:root[data-theme='dark'] .portal-page select,
+:root[data-theme='dark'] .portal-page textarea,
+:root[data-theme='dark'] .standalone-login-form input {
+  background: #111b28;
+  color: #edf2f8;
+  border-color: #405066;
+}
+:root[data-theme='dark'] .portal-page input:disabled,
+:root[data-theme='dark'] .portal-page select:disabled,
+:root[data-theme='dark'] .portal-page textarea:disabled { opacity: .7; }
+:root[data-theme='dark'] .portal-table { color: #dce5ef; }
+:root[data-theme='dark'] .portal-table tr:nth-child(even) { background: rgba(255,255,255,.025); }
+:root[data-theme='dark'] .demo-notice,
+:root[data-theme='dark'] .detail-notice { background: #293447; color: #dce5ef; border-color: #405066; }
+:root[data-theme='dark'] .bid-error,
+:root[data-theme='dark'] .portal-error { background: #3c2026; color: #ffc5cb; }
+:root[data-theme='dark'] .bid-success,
+:root[data-theme='dark'] .portal-success { background: #19392e; color: #bdf2d7; }
+:root[data-theme='dark'] .proof-divider { background: #344255; }
+:root[data-theme='dark'] .eyebrow,
+:root[data-theme='dark'] .label-overline,
+:root[data-theme='dark'] .lot-price,
+:root[data-theme='dark'] .step-number { color: #dfb965; }
+:root[data-theme='dark'] .floating-note { background: #1b2635; color: #edf2f8; border: 1px solid #344255; }
+:root[data-theme='dark'] .floating-note small { color: #aab6c6; }
+
+/* Ajustes finais de contraste para o tema escuro: evitar superfícies claras residuais. */
+:root[data-theme='dark'] .lot-image-wrap,
+:root[data-theme='dark'] .detail-image-wrap {
+  background: #202b3a !important;
+  color: #c8d2df;
+}
+:root[data-theme='dark'] .lot-image-wrap img,
+:root[data-theme='dark'] .detail-image-wrap img {
+  color: #c8d2df;
+}
+:root[data-theme='dark'] .lot-status {
+  background: #263447;
+  color: #e5edf7;
+  border: 1px solid #405066;
+}
+:root[data-theme='dark'] .lot-status.status-upcoming,
+:root[data-theme='dark'] .status-upcoming {
+  background: #3b3325;
+  color: #f0cf85;
+  border-color: #6b5833;
+}
+:root[data-theme='dark'] .lot-status.status-live {
+  background: #18382f;
+  color: #a9ebcc;
+  border-color: #2d6552;
+}
+:root[data-theme='dark'] .lot-content,
+:root[data-theme='dark'] .lot-content p,
+:root[data-theme='dark'] .lot-content small,
+:root[data-theme='dark'] .lot-meta,
+:root[data-theme='dark'] .lot-description {
+  color: #b9c5d4;
+}
+:root[data-theme='dark'] .lot-content h3,
+:root[data-theme='dark'] .lot-content strong {
+  color: #f1f5fa;
+}
+:root[data-theme='dark'] .lot-content .lot-price,
+:root[data-theme='dark'] .lot-content .price-value {
+  color: #efc66f;
+}
+:root[data-theme='dark'] .lot-content [class*='increment'],
+:root[data-theme='dark'] .lot-content [class*='Increment'] {
+  background: transparent !important;
+  color: #b9c5d4;
+}
+:root[data-theme='dark'] .lot-card,
+:root[data-theme='dark'] .step-card,
+:root[data-theme='dark'] .hero-proof,
+:root[data-theme='dark'] .trust-strip,
+:root[data-theme='dark'] .empty-state,
+:root[data-theme='dark'] .lot-detail-card,
+:root[data-theme='dark'] .detail-price-panel,
+:root[data-theme='dark'] .bid-section,
+:root[data-theme='dark'] .bid-history {
+  background-color: #182433;
+  border-color: #2e3d50;
+}
+:root[data-theme='dark'] .search-box input,
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] textarea {
+  background-color: #121b28;
+  color: #edf2f8;
+}
+:root[data-theme='dark'] ::selection {
+  background: #46566c;
+  color: #ffffff;
+}
+
+
+/* Legibilidade da tabela "Meus lotes" no painel do leiloeiro. */
+.portal-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--color-border, #344255);
+  border-radius: 10px;
+}
+.portal-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.portal-table th,
+.portal-table td {
+  padding: 14px 12px;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+:root[data-theme='dark'] .portal-table thead,
+:root[data-theme='dark'] .portal-table thead tr,
+:root[data-theme='dark'] .portal-table th {
+  background: #243247 !important;
+  color: #f1f5fb !important;
+}
+:root[data-theme='dark'] .portal-table td {
+  background-color: transparent;
+  color: #dce5ef;
+}
+:root[data-theme='dark'] .portal-table th {
+  border-bottom: 1px solid #40516a;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+:root[data-theme='dark'] .portal-table tr:hover td {
+  background-color: rgba(255,255,255,.045);
+}
+
+/* Camada final do design system: estados acessíveis e tabelas legíveis. */
+:root {
+  --color-text: #172033;
+  --color-muted: #657286;
+  --color-border: #dfe5ed;
+  --focus-ring: 0 0 0 3px rgba(198, 161, 91, .28);
+}
+:root[data-theme='dark'] {
+  --color-text: #edf3fb;
+  --color-muted: #b8c5d6;
+  --color-border: #34465c;
+  --focus-ring: 0 0 0 3px rgba(226, 190, 112, .3);
+}
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-gold, #c6a15b);
+  outline-offset: 3px;
+  box-shadow: var(--focus-ring);
+}
+:where(input, select, textarea) { accent-color: var(--color-gold, #c6a15b); }
+:where(input, select, textarea):disabled,
+:where(button):disabled { cursor: not-allowed; opacity: .65; }
+.portal-page { color: var(--color-text); }
+.portal-header { border-color: var(--color-border); }
+.portal-card { background: var(--color-surface, #fff); border-color: var(--color-border); min-width: 0; }
+.portal-card h2, .portal-card h3 { color: var(--color-text); }
+.portal-card span, .portal-item span, .portal-item small { color: var(--color-muted); }
+.portal-page input, .portal-page select, .portal-page textarea {
+  color: var(--color-text);
+  background: var(--color-surface, #fff);
+  border-color: var(--color-border);
+}
+.portal-table-wrap { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+.portal-page table, .portal-table { min-width: 720px; }
+.portal-page th, .portal-table th { color: #4c5b70; background: #edf1f6; font-weight: 700; }
+.portal-page td, .portal-table td { color: var(--color-text); }
+:root[data-theme='dark'] .portal-card { background: #172334; border-color: #34465c; }
+:root[data-theme='dark'] .portal-page a { color: #e5c477; }
+:root[data-theme='dark'] .portal-page input,
+:root[data-theme='dark'] .portal-page select,
+:root[data-theme='dark'] .portal-page textarea { background: #101a28; color: #edf3fb; border-color: #40516a; }
+:root[data-theme='dark'] .portal-page input::placeholder,
+:root[data-theme='dark'] .portal-page textarea::placeholder { color: #9eafc4; }
+:root[data-theme='dark'] .portal-page th,
+:root[data-theme='dark'] .portal-table th { background: #26364b !important; color: #edf3fb !important; border-color: #40516a; }
+:root[data-theme='dark'] .portal-page td,
+:root[data-theme='dark'] .portal-table td { color: #dce6f2; border-color: #34465c; }
+:root[data-theme='dark'] .portal-item { background: #172334; border-color: #34465c; }
+:root[data-theme='dark'] .portal-item img { background: #101a28; }
+:root[data-theme='dark'] .portal-error { color: #ffd5d5; background: #48252d; }
+:root[data-theme='dark'] .portal-success { color: #c7f6d8; background: #173d31; }
+
+@media (max-width: 760px) {
+  .portal-form { align-items: stretch; flex-direction: column; }
+  .portal-form label { flex-basis: auto; width: 100%; }
+  .portal-form button { width: 100%; }
+  .portal-card strong { overflow-wrap: anywhere; }
+}
+
+
+/* Cadastro de lotes: formulário, alternância de origem e revisão antes do envio. */
+.portal-mode-switch,
+.portal-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+.portal-mode-switch button,
+.portal-review-actions button {
+  min-height: 42px;
+}
+.portal-mode-switch button.selected {
+  background: #17283f;
+  color: #fff;
+  border-color: #17283f;
+}
+.portal-form.portal-lot-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 18px;
+  margin-top: 20px;
+}
+.portal-form.portal-lot-form > h3,
+.portal-form.portal-lot-form > label:nth-child(2),
+.portal-form.portal-lot-form > label:has(textarea),
+.portal-form.portal-lot-form > label:has(small),
+.portal-form.portal-lot-form > .portal-image-preview,
+.portal-form.portal-lot-form > button {
+  grid-column: 1 / -1;
+}
+.portal-form.portal-lot-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  color: var(--color-text);
+  font-weight: 600;
+}
+.portal-form.portal-lot-form input,
+.portal-form.portal-lot-form textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.portal-form.portal-lot-form small {
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+.portal-image-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface, #fff);
+}
+.portal-review-list {
+  display: grid;
+  grid-template-columns: minmax(140px, .7fr) minmax(0, 1.5fr);
+  gap: 10px 18px;
+  margin: 20px 0;
+}
+.portal-review-list dt {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.portal-review-list dd {
+  margin: 0;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+.portal-review-actions .secondary,
+.portal-mode-switch .secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+:root[data-theme='dark'] .portal-mode-switch button.selected {
+  background: #e5c477;
+  color: #142033;
+  border-color: #e5c477;
+}
+:root[data-theme='dark'] .portal-review-card {
+  background: #172334;
+  color: #edf3fb;
+}
+@media (max-width: 700px) {
+  .portal-form.portal-lot-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portal-form.portal-lot-form > * {
+    grid-column: 1 / -1;
+  }
+  .portal-review-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+  .portal-review-list dd {
+    margin-bottom: 10px;
+  }
+  .portal-review-actions {
+    flex-direction: column;
+  }
+  .portal-review-actions button {
+    width: 100%;
+  }
+}
