@@ -1,699 +1,313 @@
 # VERZEL — Casa de Leilões
 
-Aplicação full-stack para criação e gerenciamento de leilões online, com cadastro de lotes, disputa de lances, controle de saldo, liquidação simulada e auditoria da integridade dos eventos.
-
-O projeto foi desenvolvido com React e TypeScript no frontend, FastAPI no backend e PostgreSQL como banco de dados. A arquitetura prioriza a validação das regras de negócio no servidor, a consistência das operações financeiras simuladas e a rastreabilidade das atividades realizadas durante os leilões.
-
-> **Importante:** esta aplicação utiliza uma carteira e operações financeiras simuladas. Não processa pagamentos reais e não deve ser utilizada como plataforma financeira de produção sem as adaptações e validações necessárias.
+Aplicação full-stack para criação e gerenciamento de lotes, lances ao vivo, carteira simulada, liquidação e auditoria pública de leilões.
 
 ## Sumário
 
-- [1. Visão geral](#1-visão-geral)
-- [2. Funcionalidades](#2-funcionalidades)
-- [3. Tecnologias utilizadas](#3-tecnologias-utilizadas)
-- [4. Arquitetura da aplicação](#4-arquitetura-da-aplicação)
-- [5. Pré-requisitos](#5-pré-requisitos)
-- [6. Configuração e execução local](#6-configuração-e-execução-local)
-- [7. Banco de dados e migrações](#7-banco-de-dados-e-migrações)
-- [8. Perfis e dados de demonstração](#8-perfis-e-dados-de-demonstração)
-- [9. Regras de negócio](#9-regras-de-negócio)
-- [10. Testes automatizados](#10-testes-automatizados)
-- [11. Auditoria e integridade](#11-auditoria-e-integridade)
-- [12. Deploy e configuração de produção](#12-deploy-e-configuração-de-produção)
-- [13. Segurança e limitações conhecidas](#13-segurança-e-limitações-conhecidas)
-- [14. Uso de inteligência artificial no desenvolvimento](#14-uso-de-inteligência-artificial-no-desenvolvimento)
-- [15. Próximas evoluções](#15-próximas-evoluções)
+- [Funcionalidades](#funcionalidades)
+- [Stack e pré-requisitos](#stack-e-pré-requisitos)
+- [Execução local no Windows](#execução-local-no-windows)
+- [Configuração do banco e migrações](#configuração-do-banco-e-migrações)
+- [Contas de demonstração](#contas-de-demonstração)
+- [Testes automatizados](#testes-automatizados)
+- [Decisões técnicas e regras de negócio](#decisões-técnicas-e-regras-de-negócio)
+- [Auditoria e integridade](#auditoria-e-integridade)
+- [Deploy público](#deploy-público)
+- [Segurança antes da entrega](#segurança-antes-da-entrega)
+- [Uso de inteligência artificial no desenvolvimento](#uso-de-inteligência-artificial-no-desenvolvimento)
 
-## 1. Visão geral
+## Funcionalidades
 
-O VERZEL — Casa de Leilões é uma aplicação web que simula o funcionamento de uma plataforma de leilões digitais.
+- Cadastro e autenticação de arrematantes com token JWT e senha armazenada por hash.
+- Perfil de leiloeiro para criar e gerenciar os próprios lotes.
+- Busca de itens na Open Library e cadastro manual de lotes com URL pública de imagem.
+- Vitrine com filtros por situação e favoritos.
+- Atualização dos estados dos lotes agendados, ao vivo e encerrados.
+- Lances validados pelo backend, com histórico e mensagens para recusas.
+- Reserva do valor do lance líder e liberação da reserva quando ele é superado.
+- Carteira com saldo total, comprometido e disponível; depósito explicitamente simulado.
+- Prorrogação anti-sniping: lance aceito nos dois minutos finais prorroga o encerramento em dois minutos.
+- Liquidação do lote, débito do vencedor, crédito do leiloeiro e comprovante compartilhável.
+- Auditoria pública do histórico de lances, verificação da cadeia de hashes e checkpoint.
+- Tema claro/escuro.
 
-A aplicação permite que usuários participem de disputas por lotes, acompanhem a evolução dos lances e consultem o histórico das operações. Os leiloeiros podem administrar seus próprios lotes, enquanto o backend controla as regras de participação, a disponibilidade de saldo e a finalização das disputas.
+> **Aviso:** depósitos e valores são simulados. A aplicação não processa pagamentos reais.
 
-O projeto também implementa mecanismos de auditoria baseados em hashes criptográficos, permitindo verificar a integridade dos eventos registrados pelo sistema.
+## Stack e pré-requisitos
 
-### Objetivos técnicos
+Versões observadas no ambiente de desenvolvimento do projeto e faixas de dependências declaradas:
 
-- Construir uma aplicação full-stack com frontend e backend desacoplados.
-- Aplicar autenticação e autorização para diferentes perfis de usuário.
-- Implementar regras de negócio no servidor, sem depender da validação do navegador.
-- Controlar reservas de saldo e disputas concorrentes por lotes.
-- Utilizar migrações versionadas para administrar a estrutura do banco de dados.
-- Registrar eventos de negócio para auditoria e rastreabilidade.
-- Automatizar testes para validar os principais fluxos da aplicação.
-- Preparar a aplicação para execução local e publicação em ambientes de hospedagem.
-
-## 2. Funcionalidades
-
-### Autenticação e usuários
-
-- Cadastro de usuários.
-- Autenticação com tokens JWT.
-- Armazenamento de senhas por meio de hashes.
-- Proteção de rotas que exigem autenticação.
-- Separação de permissões entre arrematantes e leiloeiros.
-
-### Gerenciamento de lotes
-
-- Cadastro de lotes pelo perfil de leiloeiro.
-- Associação dos lotes aos seus respectivos proprietários.
-- Cadastro manual de itens.
-- Integração com a Open Library para consulta de informações de livros, conforme a implementação disponível.
-- Utilização de URLs públicas para imagens dos itens.
-- Exibição dos lotes em uma vitrine com filtros por situação.
-- Gerenciamento dos estados dos lotes.
-- Cancelamento de lotes conforme as regras de negócio e as permissões aplicáveis.
-
-### Disputas e lances
-
-- Validação de lances no backend.
-- Verificação do estado e do período de realização do leilão.
-- Aplicação de lance mínimo e incremento mínimo.
-- Impedimento de que o líder atual cubra o próprio lance.
-- Registro do histórico de lances.
-- Retorno de mensagens para lances recusados.
-- Liberação da reserva anterior quando outro participante assume a liderança.
-- Prorrogação automática do encerramento em situações de anti-sniping.
-
-### Carteira e liquidação simulada
-
-- Consulta do saldo total, comprometido e disponível.
-- Depósitos simulados.
-- Reserva do valor correspondente ao lance líder.
-- Liberação de valores reservados quando o participante perde a liderança.
-- Débito simulado do vencedor durante a liquidação.
-- Crédito simulado ao leiloeiro.
-- Consulta dos arremates e dos comprovantes disponíveis.
-
-### Auditoria
-
-- Registro de eventos de negócio.
-- Encadeamento de hashes SHA-256.
-- Consulta pública do histórico de lances, conforme as permissões de exposição definidas.
-- Verificação da integridade da cadeia de eventos.
-- Utilização de checkpoints para apoiar a detecção de alterações nos registros.
-
-### Interface
-
-- Interface web construída com React e TypeScript.
-- Tema claro e escuro.
-- Vitrine de lotes.
-- Consulta de favoritos, conforme a funcionalidade implementada.
-- Telas para acompanhamento dos leilões e consulta dos resultados.
-
-> A disponibilidade de cada funcionalidade deve ser confirmada na versão efetivamente publicada. As descrições acima documentam o escopo informado para o projeto, não substituindo a validação da aplicação executável.
-
-## 3. Tecnologias utilizadas
-
-| Camada | Tecnologias |
+| Componente | Versão/requisito |
 |---|---|
-| Frontend | React, TypeScript e Vite |
-| Estilização e interface | CSS e recursos de interface do frontend |
-| Backend | Python, FastAPI e Uvicorn |
-| Validação de dados | Pydantic |
-| ORM | SQLAlchemy |
-| Banco de dados | PostgreSQL |
-| Migrações | Alembic |
-| Autenticação | JWT e hash de senhas |
-| Testes | pytest |
-| Integração externa | Open Library |
-| Versionamento | Git e GitHub |
-| Ambiente de desenvolvimento | Windows, VS Code e terminais de desenvolvimento |
-| Contêineres | Docker e Docker Compose, quando utilizados |
-
-### Versões de referência
-
-As versões abaixo correspondem ao ambiente de desenvolvimento registrado no projeto. Antes de reproduzir a instalação, confira também os arquivos de dependências e a configuração do Docker.
-
-| Componente | Referência |
-|---|---|
-| Python | 3.13.14 no ambiente de desenvolvimento |
-| Node.js | 24.x |
-| npm | 11.x |
-| PostgreSQL | 16 recomendado |
-| React | 19 |
-| TypeScript | 6 |
-| Vite | 8 |
-| SQLAlchemy | 2.x |
+| Sistema operacional | Windows 10/11 |
+| Python | 3.13.14 no ambiente de desenvolvimento; Python 3.12 também é compatível com o Dockerfile |
+| Node.js | Node.js 24.x usado no desenvolvimento; instalar uma versão compatível com Vite 8 |
+| npm | npm 11.x usado no desenvolvimento |
+| PostgreSQL | PostgreSQL 16 recomendado |
+| Frontend | React 19, TypeScript 6, Vite 8 |
+| Backend | FastAPI, Uvicorn, SQLAlchemy 2, Alembic, Pydantic Settings |
 | Driver PostgreSQL | psycopg 3 |
 
-As versões efetivamente instaladas devem ser verificadas em `package-lock.json`, `requirements.txt`, `pyproject.toml` (se existente) e nos arquivos Docker do repositório.
+Também são úteis Git, VS Code e, se optar por executar o banco em contêiner, Docker Desktop com Docker Compose.
 
-## 4. Arquitetura da aplicação
+## Execução local no Windows
 
-A aplicação utiliza uma arquitetura separada em frontend, backend e banco de dados.
+Os comandos abaixo usam **Git Bash**. Se usar PowerShell, adapte a ativação do ambiente virtual conforme indicado.
 
-```text
-┌─────────────────────────────────┐
-│       Usuário / Navegador       │
-└────────────────┬────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────┐
-│       Frontend React/TS         │
-│                                 │
-│  Interface, formulários e       │
-│  comunicação com a API          │
-└────────────────┬────────────────┘
-                 │ HTTP / JSON
-                 ▼
-┌─────────────────────────────────┐
-│          Backend FastAPI        │
-│                                 │
-│ Autenticação e autorização      │
-│ Validação das regras de negócio │
-│ Lances e reservas de saldo      │
-│ Liquidação e auditoria          │
-└────────────────┬────────────────┘
-                 │ SQLAlchemy
-                 ▼
-┌─────────────────────────────────┐
-│          PostgreSQL             │
-│                                 │
-│ Usuários, carteiras, lotes,     │
-│ lances, transações e eventos    │
-└─────────────────────────────────┘
-```
-
-### Responsabilidades de cada camada
-
-**Frontend**
-
-Responsável por apresentar os dados, receber as interações do usuário e consumir os endpoints da API. A interface não é considerada autoridade para determinar se um lance é válido ou se um saldo pode ser utilizado.
-
-**Backend**
-
-Responsável por autenticar usuários, verificar permissões, validar as operações, aplicar as regras do leilão e persistir as alterações. Operações que envolvem saldo e concorrência devem ser coordenadas no servidor e protegidas por transações e mecanismos adequados de consistência.
-
-**Banco de dados**
-
-Responsável pela persistência dos dados e pelas restrições estruturais definidas no esquema. As migrações Alembic permitem versionar e aplicar as alterações da estrutura do banco.
-
-### Estrutura de diretórios
-
-A estrutura resumida esperada é a seguinte. Consulte o repositório para confirmar os nomes e arquivos exatos da versão publicada.
-
-```text
-casa-leiloes-verzel/
-├── backend/
-│   ├── app/
-│   │   ├── models/
-│   │   ├── routes/       # ou estrutura equivalente de rotas
-│   │   ├── schemas/
-│   │   ├── services/     # conforme a organização implementada
-│   │   └── main.py
-│   ├── tests/
-│   ├── alembic/
-│   ├── alembic.ini
-│   ├── create_auctioneer.py
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── Dockerfile
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── package-lock.json
-├── docker-compose.yml
-├── .gitignore
-└── README.md
-```
-
-## 5. Pré-requisitos
-
-Para executar a aplicação localmente, instale:
-
-- Git.
-- Python em uma versão compatível com as dependências do backend.
-- Node.js e npm compatíveis com a versão do Vite utilizada.
-- PostgreSQL, localmente ou em um serviço gerenciado.
-- Um editor de código, como Visual Studio Code.
-
-Docker Desktop e Docker Compose são opcionais quando o projeto é executado com serviços locais instalados diretamente.
-
-## 6. Configuração e execução local
-
-Os comandos a seguir utilizam Git Bash no Windows, salvo indicação em contrário.
-
-### 6.1. Obter o repositório
+### 1. Obter o projeto
 
 ```bash
 git clone <URL_DO_REPOSITORIO>
 cd casa-leiloes-verzel
 ```
 
-Substitua `<URL_DO_REPOSITORIO>` pela URL real do repositório.
+Se você já tem o repositório local, entre na pasta do projeto em vez de cloná-lo novamente.
 
-Se o projeto já estiver na sua máquina, entre na pasta existente.
+### 2. Configurar o banco PostgreSQL
 
-### 6.2. Criar o banco de dados
+Escolha uma das opções.
 
-Crie um banco e um usuário exclusivos para o desenvolvimento.
+**Opção A — PostgreSQL instalado localmente**
 
-No `psql`, utilizando uma conta administrativa:
+Crie um banco e um usuário exclusivos para desenvolvimento. Execute no `psql` com um usuário administrador, substituindo a senha de exemplo:
 
 ```sql
-CREATE USER verzel_dev WITH PASSWORD 'SENHA_LOCAL_FORTE';
+CREATE USER verzel_dev WITH PASSWORD 'SUBSTITUA_POR_UMA_SENHA_LOCAL_FORTE';
 CREATE DATABASE verzel OWNER verzel_dev;
 ```
 
-Substitua a senha de exemplo por uma senha local própria.
+Não use essa senha de exemplo em produção.
 
-Se utilizar Supabase ou outro PostgreSQL gerenciado, crie ou selecione um banco de desenvolvimento e obtenha a URL de conexão apropriada.
+**Opção B — Docker Compose**
 
-### 6.3. Configurar o backend
-
-Entre na pasta do backend:
-
-```bash
-cd backend
-```
-
-Crie e ative o ambiente virtual:
-
-```bash
-python -m venv .venv
-source .venv/Scripts/activate
-```
-
-No PowerShell, utilize:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-Atualize o instalador e instale as dependências:
-
-```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Copie o arquivo de exemplo das variáveis de ambiente:
-
-```bash
-cp .env.example .env
-```
-
-No PowerShell, caso necessário:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Edite `backend/.env` e configure os valores para o ambiente local.
-
-Exemplo ilustrativo:
-
-```dotenv
-DATABASE_URL=postgresql+psycopg://verzel_dev:SENHA_LOCAL@localhost:5432/verzel
-JWT_SECRET_KEY=SUBSTITUA_POR_UM_SEGREDO_ALEATORIO
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-FRONTEND_ORIGIN=http://localhost:5173
-```
-
-Utilize as variáveis efetivamente reconhecidas pela configuração do backend. O exemplo não substitui a conferência de `app/core/config.py` ou do módulo equivalente.
-
-**Cuidados importantes:**
-
-- Gere um segredo aleatório exclusivo para `JWT_SECRET_KEY`.
-- Não utilize as credenciais de produção no ambiente local.
-- Se a senha do banco contiver caracteres reservados, faça o devido URL encoding.
-- Não versione o arquivo `.env`.
-
-### 6.4. Aplicar as migrações
-
-Ainda na pasta `backend`, execute:
-
-```bash
-alembic upgrade head
-```
-
-O comando aplica as migrações pendentes e prepara o esquema do banco de dados.
-
-### 6.5. Iniciar a API
-
-Execute:
-
-```bash
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
-```
-
-Quando a inicialização for bem-sucedida, os endereços locais esperados são:
-
-| Recurso | Endereço |
-|---|---|
-| API | `http://localhost:8001` |
-| Documentação interativa | `http://localhost:8001/docs` |
-| Verificação de saúde | `http://localhost:8001/health` |
-
-Esses endereços pressupõem que as rotas correspondentes estejam implementadas e que a API tenha iniciado corretamente.
-
-Mantenha o terminal do backend aberto.
-
-### 6.6. Configurar o frontend
-
-Abra outro terminal na raiz do projeto:
-
-```bash
-cd frontend
-npm install
-```
-
-Configure a URL da API no arquivo `frontend/.env`:
-
-```dotenv
-VITE_API_URL=http://localhost:8001
-```
-
-Inicie o servidor de desenvolvimento:
-
-```bash
-npm run dev
-```
-
-Acesse:
-
-`http://localhost:5173`
-
-A porta pode variar conforme a configuração do Vite.
-
-A variável `VITE_API_URL` é incorporada ao build do frontend. Portanto, qualquer alteração nessa variável exige reiniciar o servidor de desenvolvimento ou gerar um novo build, conforme o ambiente utilizado.
-
-### 6.7. Executar com Docker Compose
-
-Se o repositório incluir um `docker-compose.yml` funcional, também será possível utilizar os contêineres.
-
-Antes de executar, confira os serviços, as portas, os volumes e as variáveis de ambiente definidos no arquivo.
-
-Depois de configurar os segredos locais:
+Na raiz do projeto, confira primeiro as variáveis do `docker-compose.yml` e gere valores locais próprios para `POSTGRES_PASSWORD` e `JWT_SECRET_KEY`. Depois execute:
 
 ```bash
 docker compose up --build -d
 docker compose ps
 ```
 
-Para acompanhar os logs:
+O Compose publica a aplicação web local na porta `8080` e a API na porta `8001`. A URL de API usada no build do frontend do Compose é `http://localhost:8001`, adequada somente para desenvolvimento local.
+
+### 3. Configurar e iniciar o backend
+
+Na raiz do projeto, abra um terminal:
 
 ```bash
-docker compose logs -f
+cd backend
+python -m venv .venv
+source .venv/Scripts/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
-Para encerrar os serviços:
+No PowerShell, ative o ambiente virtual com:
 
-```bash
-docker compose down
+```powershell
+.\.venv\Scripts\Activate.ps1
 ```
 
-A configuração registrada para o projeto prevê o frontend na porta `8080` e a API na porta `8001`. Confirme essas portas no Compose antes de utilizá-las.
+Edite `backend/.env` e informe os valores do seu banco local. Exemplo de formato:
 
-Não execute simultaneamente diferentes configurações de banco de dados sem verificar qual instância cada serviço está utilizando.
+```dotenv
+DATABASE_URL=postgresql+psycopg://verzel_dev:SENHA_LOCAL@localhost:5432/verzel
+JWT_SECRET_KEY=COLOQUE_AQUI_UM_SEGREDO_ALEATORIO_LONGO
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+FRONTEND_ORIGIN=http://localhost:5173
+```
 
-## 7. Banco de dados e migrações
+Use uma senha URL-encoded na URL de conexão se ela contiver caracteres reservados. Gere um segredo aleatório forte para `JWT_SECRET_KEY`; não reutilize o valor de exemplo nem o publique.
 
-A estrutura do banco é administrada por Alembic, integrado ao SQLAlchemy.
-
-O esquema registrado no projeto inclui entidades para:
-
-- Usuários.
-- Carteiras.
-- Lotes.
-- Lances.
-- Transações de carteira.
-- Eventos de auditoria.
-
-Os nomes e as restrições exatas devem ser conferidos nos modelos e nas migrações versionadas.
-
-### Comandos úteis
-
-Executar as migrações pendentes:
+A partir da pasta `backend`, aplique as migrações e inicie a API:
 
 ```bash
 alembic upgrade head
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
 ```
 
-Consultar a revisão aplicada:
+A API estará em `http://localhost:8001`, a documentação interativa em `http://localhost:8001/docs` e a verificação de saúde em `http://localhost:8001/health`.
+
+### 4. Configurar e iniciar o frontend
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm install
+```
+
+Crie `frontend/.env` com a URL da API local:
+
+```dotenv
+VITE_API_URL=http://localhost:8001
+```
+
+Inicie o frontend:
+
+```bash
+npm run dev
+```
+
+Abra `http://localhost:5173`.
+
+> `VITE_API_URL` é incorporada ao frontend no momento do build. Em produção, configure-a antes de executar `npm run build` ou antes de o serviço de hospedagem construir o frontend.
+
+## Configuração do banco e migrações
+
+O esquema é gerenciado por Alembic. Sempre use a pasta `backend` para executar os comandos.
+
+Verificar a revisão atual:
 
 ```bash
 alembic current
 ```
 
-Consultar o histórico:
+Ver o histórico:
 
 ```bash
 alembic history
 ```
 
-Verificar o estado da migração:
+Aplicar as migrações pendentes:
 
 ```bash
-alembic heads
+alembic upgrade head
 ```
 
-Execute esses comandos na pasta `backend`, com o ambiente virtual ativado e as variáveis de ambiente apontando para o banco correto.
+As migrações também são executadas no início do contêiner do backend conforme o `backend/Dockerfile`.
 
-**Atenção:** nunca execute testes destrutivos contra o banco de produção.
+### Dados iniciais e contas de demonstração
 
-## 8. Perfis e dados de demonstração
+Não há no repositório um comando genérico de seed que crie automaticamente uma coleção completa de usuários, carteiras e lotes de demonstração. Para preparar dados controlados:
 
-A demonstração da aplicação deve utilizar contas e dados fictícios.
+1. Crie um arrematante pela interface ou use `POST /auth/register` na documentação `/docs`.
+2. Crie um leiloeiro de desenvolvimento executando o script interativo `backend/create_auctioneer.py`, com o backend configurado para apontar ao banco correto:
 
-### Arrematante
+   ```bash
+   cd backend
+   source .venv/Scripts/activate
+   python create_auctioneer.py
+   ```
 
-O arrematante participa dos leilões, acompanha seus lances e consulta sua carteira e seus arremates, de acordo com as permissões implementadas.
+3. Entre com o perfil de leiloeiro e cadastre lotes de demonstração pela interface.
+4. Use contas e dados fictícios. Não publique senhas, tokens, dados pessoais ou contas privadas no README.
 
-Crie uma conta pela interface ou pelo endpoint de cadastro documentado na API.
+O cadastro público não deve permitir que alguém escolha livremente o papel de leiloeiro. O script é uma ferramenta administrativa; não o exponha como endpoint público.
 
-### Leiloeiro
+## Contas de demonstração
 
-O leiloeiro administra os próprios lotes, observadas as regras de autorização e de estado do sistema.
+Este repositório não define credenciais públicas fixas para demonstração. Para a avaliação, crie contas de teste separadas e registre as credenciais em um canal privado e seguro, se for necessário compartilhá-las com avaliadores. Não coloque senhas reais ou tokens neste arquivo, no Git ou em capturas de tela públicas.
 
-O repositório disponibiliza, conforme a configuração informada, o script administrativo `backend/create_auctioneer.py`.
+Sugestão de preparação:
 
-Para utilizá-lo:
+- **Leiloeiro de demonstração:** conta criada administrativamente e usada para publicar lotes.
+- **Arrematante A:** conta criada pelo fluxo público para testar depósito simulado e lances.
+- **Arrematante B:** segunda conta para testar disputa, superação de lance e liberação de reserva.
 
-```bash
-cd backend
-source .venv/Scripts/activate
-python create_auctioneer.py
-```
+Use valores fictícios e evite dados pessoais reais.
 
-O script deve ser executado somente em um ambiente controlado, apontando para o banco correto.
+## Testes automatizados
 
-Não disponibilize a criação de usuários privilegiados como uma operação pública sem controles de autorização.
+A suíte do backend foi executada em Windows com Python 3.13.14 e pytest 9.1.1. O resultado registrado em 27/10/2026 foi **82 testes aprovados em 5,14 segundos**, sem falhas ou erros. Isso valida os cenários cobertos pelos testes; não significa 100% de cobertura de código nem substitui testes manuais.
 
-### Cenário de demonstração recomendado
+Os testes de integração usam um PostgreSQL isolado. No ambiente atual, a configuração de teste é validada pelo arquivo `backend/tests/conftest.py` e espera uma base local de teste dedicada `verzel_test`, usuário `verzel_test`, porta `5433`. **Nunca aponte a URL de testes para o banco de desenvolvimento ou produção.**
 
-Prepare três contas de teste:
-
-1. **Leiloeiro:** publica lotes fictícios.
-2. **Arrematante A:** realiza um depósito simulado e oferece lances.
-3. **Arrematante B:** disputa os mesmos lotes e supera os lances anteriores.
-
-Com esse cenário, é possível demonstrar a evolução dos lances, a liberação de reservas, o encerramento dos lotes e a consulta dos registros de auditoria.
-
-Não publique senhas, tokens ou dados pessoais de contas privadas no README.
-
-## 9. Regras de negócio
-
-### Validação de lances
-
-Os lances devem ser validados pelo backend. Entre as regras documentadas para o projeto estão:
-
-- O lote precisa estar no estado adequado para receber lances.
-- A operação precisa ocorrer dentro do período permitido.
-- O primeiro lance deve respeitar o valor mínimo de abertura.
-- Os lances seguintes devem respeitar o incremento mínimo.
-- O líder atual não pode cobrir o próprio lance.
-- O participante precisa ter saldo disponível suficiente.
-- A operação deve respeitar as permissões do usuário.
-
-A interface pode antecipar algumas validações para melhorar a experiência, mas a decisão final pertence ao servidor.
-
-### Reserva de saldo
-
-O saldo disponível corresponde ao saldo total menos os valores comprometidos.
-
-Quando um participante assume a liderança, o valor necessário fica reservado. Se outro participante oferecer um lance superior e válido, a reserva anterior deve ser liberada e a nova reserva deve ser estabelecida.
-
-Essas operações precisam ser protegidas contra concorrência para evitar reservas inconsistentes ou utilização duplicada do saldo.
-
-### Anti-sniping
-
-A regra documentada prevê que um lance aceito nos dois minutos finais do lote prorrogue o encerramento por mais dois minutos.
-
-O comportamento deve ser validado com testes que considerem o horário do servidor, os limites do período e lances concorrentes.
-
-### Encerramento e liquidação
-
-Quando o lote é encerrado:
-
-- Um lote sem lances termina sem vencedor e sem transferência de valores.
-- Um lote com vencedor pode seguir o fluxo de liquidação permitido.
-- O valor simulado é debitado do vencedor e creditado ao leiloeiro.
-- O sistema disponibiliza o comprovante previsto para a operação.
-
-A liquidação deve ser idempotente ou possuir controles equivalentes que impeçam a transferência duplicada em caso de requisições repetidas.
-
-### Falhas em integrações externas
-
-A integração com a Open Library deve ser tratada como uma dependência externa. Uma indisponibilidade do serviço não deve interromper funcionalidades locais que não dependam dessa integração.
-
-O cadastro manual de lotes pode servir como alternativa quando esse fluxo estiver implementado e disponível.
-
-## 10. Testes automatizados
-
-O backend utiliza pytest para automatizar cenários de validação.
-
-Segundo o registro de execução informado para o projeto, em 27 de outubro de 2026, a suíte do backend apresentou **82 testes aprovados em 5,14 segundos**, utilizando Python 3.13.14 e pytest 9.1.1.
-
-Esse resultado corresponde à execução registrada. Para uma entrega pública, recomenda-se executar novamente os testes na versão final do código e atualizar esta informação caso o resultado seja diferente.
-
-### Executar os testes do backend
-
-Entre na pasta `backend`, ative o ambiente virtual e configure a base de teste isolada.
-
-A configuração registrada utiliza PostgreSQL com o banco `verzel_test`, usuário `verzel_test` e porta `5433`. Confirme os valores em `backend/tests/conftest.py` antes de executar.
-
-No Git Bash:
+Configure `TEST_DATABASE_URL` para o banco isolado e execute a partir de `backend`:
 
 ```bash
 export TEST_DATABASE_URL="postgresql+psycopg://verzel_test:SENHA_TESTE@localhost:5433/verzel_test"
 python -m pytest -v
 ```
 
-No PowerShell:
+Os testes mais recentes incluem encerramento de lotes agendados sem lances, transição de lote agendado para ao vivo, lances concorrentes, reservas de saldo, anti-sniping, liquidação e auditoria.
 
-```powershell
-$env:TEST_DATABASE_URL = "postgresql+psycopg://verzel_test:SENHA_TESTE@localhost:5433/verzel_test"
-python -m pytest -v
-```
-
-Ajuste a URL conforme as variáveis realmente utilizadas pela suíte.
-
-**Não aponte a configuração de testes para o banco de desenvolvimento ou de produção.** Se os testes criarem ou removerem tabelas, utilize uma instância descartável e exclusiva.
-
-### Cenários de teste relevantes
-
-A suíte registrada inclui cenários relacionados a:
-
-- Encerramento de lotes agendados sem lances.
-- Transição de lotes agendados para o estado ao vivo.
-- Lances concorrentes.
-- Reservas e liberação de saldo.
-- Regras de anti-sniping.
-- Liquidação.
-- Auditoria.
-
-A lista acima não implica cobertura integral de todos os componentes ou de todos os cenários de falha.
-
-### Verificar o frontend
-
-Na pasta `frontend`:
+Verifique também o frontend:
 
 ```bash
+cd frontend
 npm ci
 npm run lint
 npm run build
 ```
 
-O comando `npm ci` exige um arquivo de lock compatível com o `package.json`.
+## Decisões técnicas e regras de negócio
 
-Se o projeto não possuir um script `lint`, verifique os scripts disponíveis em `frontend/package.json` antes de executar o comando.
+### Organização da aplicação
 
-Uma compilação bem-sucedida confirma que o build foi concluído; não substitui testes de interface, integração ou validação manual.
+- **Frontend:** React + TypeScript + Vite. A URL base da API é configurada por `VITE_API_URL`.
+- **Backend:** FastAPI fornece endpoints REST e valida as regras no servidor; o frontend não é considerado autoridade para aceitar lances ou alterar saldos.
+- **Banco:** PostgreSQL persiste usuários, carteiras, lotes, lances, transações e eventos de auditoria.
+- **Migrações:** Alembic mantém o esquema versionado.
+- **Autenticação:** JWT Bearer e hashes de senha; rotas protegidas exigem autenticação e verificam o papel e a propriedade do recurso.
 
-## 11. Auditoria e integridade
+### Regras principais de leilão
 
-O projeto registra eventos de negócio em uma cadeia de hashes SHA-256. O mecanismo permite verificar a relação entre eventos encadeados e detectar determinadas alterações no histórico.
+- Só são aceitos lances quando o lote está ao vivo, dentro do intervalo de início e encerramento.
+- O primeiro lance deve ser pelo menos igual ao lance inicial.
+- Lances seguintes devem atingir o lance atual acrescido do incremento mínimo.
+- O líder atual não pode cobrir o próprio lance.
+- O saldo disponível é o saldo total menos os valores comprometidos em lances.
+- Quando um novo lance supera o anterior, a reserva anterior é liberada e o novo valor fica comprometido.
+- Um lance aceito nos últimos dois minutos prorroga o encerramento em dois minutos (anti-sniping).
+- Ao encerrar, a liquidação transfere o valor simulado do vencedor para o leiloeiro e permite consultar o comprovante. Um lote sem lances é encerrado sem vencedor e sem pagamento.
+- Cancelamento e liquidação são validados no backend conforme o estado do lote e as permissões do usuário.
+- A integração com a API externa não deve impedir que as funcionalidades locais já disponíveis, como vitrine, auditoria e comprovante, continuem funcionando quando a API falhar.
 
-A solução também prevê checkpoints, que auxiliam na comparação da cadeia registrada com referências de integridade previamente estabelecidas.
+## Auditoria e integridade
 
-### Objetivos do mecanismo
+O backend registra eventos de negócio em uma cadeia de hashes SHA-256 e oferece verificação pública do histórico de lances. Checkpoints ajudam a detectar alterações que não seriam evidentes apenas pela verificação da cadeia corrente.
 
-- Apoiar a rastreabilidade das operações.
-- Detectar alterações em eventos cobertos pela cadeia de hashes.
-- Permitir a verificação do histórico de lances.
-- Facilitar a investigação de inconsistências nos registros.
+A auditoria permite identificar inserção, remoção ou alteração de eventos cobertos pelo mecanismo. Como em qualquer solução de auditoria, as garantias dependem da proteção das credenciais e do checkpoint: não se deve afirmar que um mecanismo local torna impossível toda adulteração por um administrador com controle total do banco e de todos os artefatos de verificação.
 
-### Limitações
+As respostas públicas de auditoria e os comprovantes devem evitar expor dados pessoais desnecessários.
 
-Uma cadeia de hashes não é, por si só, garantia absoluta de imutabilidade.
+## Deploy público
 
-Se um agente tiver controle total sobre o banco e sobre todos os artefatos utilizados para verificar a integridade, poderá existir a possibilidade de reconstruir registros e hashes. A força da auditoria depende também da proteção das credenciais, da preservação dos checkpoints e da separação entre os dados auditados e as referências de verificação.
+O deploy público é obrigatório para o desafio. A aplicação publicada deve funcionar sem depender de `localhost`.
 
-Os endpoints públicos de auditoria e os comprovantes devem expor somente os dados necessários, evitando a divulgação de informações pessoais ou credenciais.
+Uma arquitetura simples para a entrega é:
 
-## 12. Deploy e configuração de produção
+- **PostgreSQL:** Supabase ou outro PostgreSQL gerenciado.
+- **Backend FastAPI:** serviço que suporte Python/Docker, por exemplo Render.
+- **Frontend React/Vite:** hospedagem estática, por exemplo Vercel ou Netlify.
 
-A publicação pública faz parte dos requisitos de entrega do desafio. Antes de divulgar a aplicação, é necessário validar o frontend, o backend, o banco de dados e os fluxos de negócio no ambiente publicado.
+Os nomes dos provedores são sugestões; o importante é configurar corretamente as URLs públicas e validar o fluxo completo.
 
-### Arquitetura sugerida
+### Backend em produção
 
-| Componente | Opção de hospedagem |
-|---|---|
-| Frontend React/Vite | Vercel ou Netlify |
-| Backend FastAPI | Render ou outro serviço compatível com Python/Docker |
-| PostgreSQL | Supabase ou outro provedor PostgreSQL gerenciado |
-
-Esses provedores são sugestões de arquitetura, não uma confirmação de que o deploy já foi realizado.
-
-### 12.1. Banco de produção
-
-1. Crie um banco separado dos ambientes local e de teste.
-2. Configure as credenciais e a URL de conexão do banco.
-3. Habilite SSL conforme os requisitos do provedor.
-4. Aplique as migrações antes de disponibilizar os fluxos que dependem das tabelas.
-5. Configure backups e monitore a disponibilidade do banco.
-
-Não reutilize credenciais ou dados privados de desenvolvimento.
-
-### 12.2. Backend
-
-Configure as variáveis de ambiente no painel do serviço:
+Configure as variáveis no painel do serviço de hospedagem, nunca em arquivos versionados:
 
 ```dotenv
 DATABASE_URL=URL_DO_POSTGRESQL_DE_PRODUCAO
-JWT_SECRET_KEY=SEGREDO_ALEATORIO_EXCLUSIVO
+JWT_SECRET_KEY=SEGREDO_ALEATORIO_FORTE_E_EXCLUSIVO
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 FRONTEND_ORIGIN=https://SEU-FRONTEND-PUBLICO
 ```
 
-Utilize os nomes e formatos efetivamente suportados pelo backend.
+Use a URL de conexão fornecida pelo provedor PostgreSQL e, quando exigido, habilite SSL conforme a configuração do provedor. Não use a URL de banco de testes.
 
-Um comando de inicialização possível, caso seja compatível com o ambiente e com a configuração do projeto, é:
+Comandos típicos para um serviço Python que constrói a partir da pasta `backend`:
 
-```bash
-alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port "$PORT"
-```
+- **Build/instalação:** `pip install -r requirements.txt`
+- **Comando de inicialização:**
 
-Confirme se o provedor disponibiliza a variável `PORT`. No Docker, confira o `Dockerfile` e o `ENTRYPOINT` para evitar executar as migrações duas vezes ou iniciar o servidor com configurações incompatíveis.
+  ```bash
+  alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+  ```
 
-Migrações de produção devem ser tratadas como operações controladas. Para ambientes com múltiplas instâncias, prefira executá-las em uma etapa de release ou em um processo dedicado, quando suportado pelo provedor.
+Se o provedor usar o `backend/Dockerfile`, ele já executa as migrações antes de iniciar o Uvicorn. Confirme se a plataforma define a variável `PORT` e adapte o comando de acordo com as instruções dela.
 
-### 12.3. CORS
+O middleware CORS atual aceita `http://localhost:5173` e a origem definida por `FRONTEND_ORIGIN`. Configure esta última com a origem pública exata do frontend, incluindo `https://` e sem caminhos como `/login`. Se a hospedagem oferecer URLs de preview diferentes, configure-as deliberadamente; não use `*` indiscriminadamente com credenciais.
 
-A configuração do backend deve permitir a origem pública exata do frontend.
+Após publicar, verifique:
 
-No ambiente local, a origem utilizada é:
+- `https://SUA-API-PUBLICA/health`
+- `https://SUA-API-PUBLICA/docs`
 
-```text
-http://localhost:5173
-```
-
-Em produção, configure a origem HTTPS do domínio publicado, por exemplo:
-
-```text
-https://seu-projeto.vercel.app
-```
-
-O endereço acima é ilustrativo. Utilize a URL real da aplicação.
-
-Não habilite origens indiscriminadas apenas para contornar erros de integração. Caso existam URLs de preview, avalie quais precisam ser autorizadas.
-
-### 12.4. Frontend
+### Frontend em produção
 
 Configure a variável de build:
 
@@ -701,117 +315,78 @@ Configure a variável de build:
 VITE_API_URL=https://SUA-API-PUBLICA
 ```
 
-Na configuração de hospedagem, os valores esperados são:
+- **Diretório raiz/build:** `frontend`
+- **Comando de build:** `npm ci && npm run build`
+- **Diretório de saída:** `dist`
 
-- Diretório raiz: `frontend`.
-- Comando de instalação e build: `npm ci && npm run build`.
-- Diretório de saída: `dist`.
+O frontend deve chamar a API pública, não `localhost:8001`. Em serviços de hospedagem, configure `VITE_API_URL` nas variáveis de ambiente do projeto e faça um novo deploy para que o valor seja incorporado ao build.
 
-Confirme as opções exigidas pelo provedor e o conteúdo de `frontend/package.json`.
+### Banco de produção e dados iniciais
 
-**A URL da API não pode apontar para `localhost` em uma aplicação acessada pela internet.** Variáveis com prefixo `VITE_` são incorporadas ao código disponibilizado ao navegador e não devem conter segredos.
+1. Crie um banco PostgreSQL de produção separado dos bancos local e de teste.
+2. Configure `DATABASE_URL` no backend.
+3. Aplique `alembic upgrade head` antes de testar os endpoints.
+4. Crie as contas de demonstração usando os fluxos descritos em [Contas de demonstração](#contas-de-demonstração).
+5. Cadastre lotes fictícios e configure datas futuras para testar o fluxo ao vivo.
+6. Não copie dados pessoais ou credenciais de desenvolvimento para a produção.
 
-### 12.5. Validação após a publicação
+### Checklist de validação após o deploy
 
-Depois de realizar o deploy:
+- [ ] A página inicial carrega usando a URL pública.
+- [ ] Cadastro e login funcionam.
+- [ ] A vitrine lista os lotes e seus estados.
+- [ ] O leiloeiro consegue criar e cancelar um lote elegível.
+- [ ] Um arrematante consegue fazer um depósito simulado.
+- [ ] Lances válidos são aceitos; lances inválidos são rejeitados com mensagem clara.
+- [ ] A reserva do líder é atualizada quando outro usuário supera o lance.
+- [ ] O anti-sniping funciona próximo do encerramento.
+- [ ] O lote encerra corretamente e pode ser liquidado pelo leiloeiro.
+- [ ] Meus arremates e o comprovante público funcionam.
+- [ ] A auditoria pública mostra o histórico e informa a integridade da cadeia.
+- [ ] A aplicação funciona em janela anônima ou outro dispositivo, sem depender de `localhost`.
+- [ ] CORS não bloqueia o frontend publicado e não está aberto indiscriminadamente.
+- [ ] Não há senhas, tokens, chaves privadas ou URLs com credenciais no repositório.
 
-- Verifique se a página inicial carrega.
-- Confirme se o frontend alcança a API pública.
-- Teste o cadastro e o login.
-- Crie e consulte lotes.
-- Teste depósitos simulados e lances.
-- Verifique reservas e liberações de saldo.
-- Teste encerramento e liquidação.
-- Consulte os comprovantes e o histórico de auditoria.
-- Teste as permissões dos diferentes perfis.
-- Repita os testes em uma janela anônima ou em outro dispositivo.
+## Segurança antes da entrega
 
-Os endpoints `/health` e `/docs` podem ajudar a validar a API se estiverem disponíveis no ambiente publicado. Avalie se a documentação interativa deve permanecer acessível publicamente em produção.
+Antes de publicar:
 
-## 13. Segurança e limitações conhecidas
+1. Confirme que `.env`, `.venv`, `node_modules`, dumps de banco, tokens e arquivos de credenciais estão ignorados pelo Git.
+2. Revise `git status --short` e os arquivos que serão enviados.
+3. Gere um `JWT_SECRET_KEY` exclusivo para produção.
+4. Nunca use as credenciais do banco de testes em produção.
+5. Verifique o histórico do Git se algum segredo já tiver sido commitado. Remover um segredo do arquivo atual não o remove do histórico; se houve exposição, rotacione-o.
+6. Confirme que o cadastro público não permite criar usuários com papel privilegiado.
+7. Use contas e itens fictícios na demonstração.
 
-Antes de disponibilizar o projeto:
+## Uso de inteligência artificial no desenvolvimento
 
-- Confirme que `.env`, `.venv`, `node_modules`, arquivos de credenciais e dumps locais não serão publicados.
-- Revise os arquivos incluídos no commit.
-- Gere segredos exclusivos para produção.
-- Verifique se o cadastro público não permite atribuição indevida de privilégios.
-- Confirme que as rotas verificam autenticação, autorização e propriedade dos recursos.
-- Proteja operações de saldo, lances e liquidação contra concorrência e repetição indevida.
-- Evite registrar senhas, tokens ou dados pessoais desnecessários nos logs.
-- Verifique as dependências e mantenha os pacotes atualizados.
-- Confirme que o banco de testes está isolado do banco de produção.
-- Revise o histórico do Git caso alguma credencial já tenha sido versionada e rotacione os segredos expostos.
+O ChatGPT foi utilizado como ferramenta de apoio durante o desenvolvimento do VERZEL — Casa de Leilões. Seu uso fez parte de um processo iterativo de planejamento, análise de alternativas técnicas, implementação, depuração e documentação.
 
-### Limitações funcionais e operacionais
+### Como a IA auxiliou no projeto
 
-A aplicação é uma plataforma de demonstração e avaliação técnica.
+- **Planejamento e estruturação:** apoio na organização das etapas de desenvolvimento e na definição da separação entre frontend, backend e banco de dados.
+- **Decisões de arquitetura:** discussão de alternativas e apoio à tomada de decisões sobre React, TypeScript, FastAPI, SQLAlchemy, PostgreSQL e Alembic, considerando os requisitos da aplicação.
+- **Implementação:** auxílio na elaboração, explicação e revisão de código e na construção dos fluxos da aplicação, conforme o trabalho realizado em cada etapa.
+- **Depuração e configuração:** análise de mensagens de erro, investigação de problemas e orientação durante a configuração do ambiente, das dependências, do banco de dados e das migrações.
+- **Regras de negócio e testes:** apoio à análise de cenários, à identificação de casos de borda e à elaboração e interpretação de testes relacionados às regras do leilão.
+- **Documentação e entrega:** auxílio na organização deste README e na preparação das instruções de execução, configuração e publicação.
 
-Os valores da carteira e as transferências são simulados. O mecanismo de auditoria oferece verificabilidade dentro das garantias de sua implementação, mas não equivale a armazenamento imutável independente. A disponibilidade pública, a resiliência operacional, a cobertura de testes e a segurança do ambiente dependem de validações adicionais.
+### Revisão e responsabilidade técnica
 
-Não se deve apresentar a aplicação como um serviço financeiro pronto para operação comercial apenas porque os principais fluxos de demonstração funcionam.
+As respostas geradas pela IA foram utilizadas como sugestões e apoio técnico, não como garantia automática de correção. As recomendações precisam ser comparadas com os requisitos e com o código real; comandos, alterações e funcionalidades devem ser verificados no ambiente do projeto.
 
-## 14. Uso de inteligência artificial no desenvolvimento
+A IA não substitui a compreensão das decisões técnicas, a revisão do código, a execução dos testes nem a responsabilidade sobre o resultado entregue. Resultados de testes e estado do deploy devem ser apresentados somente quando confirmados por execução ou evidência correspondente.
 
-Ferramentas de inteligência artificial foram utilizadas como apoio ao processo de desenvolvimento do VERZEL — Casa de Leilões, contribuindo para a organização do trabalho, a análise técnica e a implementação da aplicação.
+Esta declaração descreve as formas de assistência utilizadas durante o desenvolvimento. A versão final deve refletir fielmente as atividades realizadas e as ferramentas efetivamente utilizadas.
 
-A IA foi utilizada como ferramenta de assistência ao desenvolvimento, e não como substituta da validação do código ou da responsabilidade técnica sobre o resultado entregue.
 
-### Principais formas de utilização
+### Solicitação de acesso para testes
 
-**1. Planejamento e estruturação do projeto**
+Caso deseje testar a aplicação utilizando uma das contas de demonstração já configuradas, entre em contato pelo e-mail **jmolima2000@gmail.com** para solicitar as credenciais de acesso.
 
-A IA auxiliou na organização inicial do projeto, na definição dos componentes necessários e no planejamento da separação entre frontend, backend e banco de dados.
+As contas de demonstração permitem explorar os fluxos da aplicação de acordo com os respectivos perfis de usuário, incluindo as funcionalidades de leiloeiro e arrematante.
 
-**2. Apoio às decisões de arquitetura**
+Por segurança, as credenciais não são disponibilizadas publicamente neste repositório e serão compartilhadas mediante solicitação por e-mail.
 
-A IA auxiliou na análise de alternativas técnicas e na discussão de decisões relacionadas à utilização de React, TypeScript, FastAPI, SQLAlchemy, PostgreSQL e Alembic, considerando as necessidades de persistência, autenticação e regras de negócio.
-
-**3. Apoio à implementação**
-
-A IA foi utilizada para auxiliar na elaboração e revisão de código, na estruturação de componentes e módulos e na implementação dos fluxos funcionais da aplicação, conforme as necessidades identificadas durante o desenvolvimento.
-
-**4. Análise de problemas e depuração**
-
-A ferramenta auxiliou na interpretação de mensagens de erro, na análise de problemas de configuração e na orientação para correções durante a instalação de dependências, a configuração do ambiente e a execução das migrações.
-
-**5. Regras de negócio e consistência**
-
-A IA apoiou a análise de cenários relacionados à validação de lances, ao controle de saldo, à concorrência, ao encerramento dos lotes e à auditoria, ajudando a identificar situações que precisavam de tratamento ou testes específicos.
-
-**6. Testes e validação técnica**
-
-A IA foi utilizada como apoio na análise dos cenários de teste, na interpretação dos resultados e na investigação de falhas. A aprovação dos testes deve ser demonstrada pelos resultados efetivamente obtidos na execução do projeto.
-
-**7. Documentação e preparação para entrega**
-
-A ferramenta auxiliou na organização deste README, na documentação das instruções de execução e na preparação das orientações de configuração e publicação.
-
-### Responsabilidade e validação
-
-As sugestões geradas por IA precisam ser confrontadas com o código, as dependências e os requisitos reais da aplicação. A ferramenta pode produzir instruções incorretas, soluções incompletas ou recomendações incompatíveis com o ambiente.
-
-Por isso, o resultado deve ser validado por meio da revisão do código, da execução dos testes e da verificação prática dos fluxos da aplicação.
-
-A utilização da IA não constitui, por si só, evidência de que uma funcionalidade foi concluída, de que um teste passou ou de que o deploy está funcionando.
-
-A declaração acima descreve as categorias de assistência utilizadas no desenvolvimento. A submissão deve manter apenas as atividades que correspondam efetivamente ao processo realizado e identificar as ferramentas utilizadas conforme as exigências do desafio.
-
-## 15. Próximas evoluções
-
-As seguintes melhorias podem ser consideradas para futuras versões, conforme os resultados da validação e as prioridades do projeto:
-
-- Testes de integração e de concorrência mais abrangentes.
-- Testes automatizados de interface e fluxos ponta a ponta.
-- Melhorias na observabilidade, nos logs e no monitoramento.
-- Estratégias de recuperação e backup do banco de dados.
-- Revisão de segurança e análise de dependências.
-- Melhorias de acessibilidade e experiência do usuário.
-- Separação e proteção independente das referências de auditoria.
-- Pipeline de integração contínua para testes e build.
-- Documentação adicional dos endpoints e dos contratos da API.
-- Preparação para integração com serviços reais de pagamento, somente mediante implementação, requisitos de segurança e validações específicas.
-
----
-
-**Status da documentação:** este README descreve a arquitetura, os fluxos e os procedimentos informados para o projeto. Antes da submissão, os comandos, as variáveis de ambiente, as funcionalidades e os resultados de testes devem ser conferidos na versão final do repositório.
+**Importante:** os depósitos e as transações financeiras da aplicação são simulados e não envolvem pagamentos reais.
